@@ -1,7 +1,7 @@
-import { TransactionType } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 import { prisma } from '@/shared/config/database.js';
 import type { CreateTransactionInput, UpdateTransactionInput, TransactionFilters } from './transactions.types.js';
+import { TransactionType } from '@/shared/types/categories.enum.js';
 
 export async function findAllByUserId(
   userId: string,
@@ -13,13 +13,12 @@ export async function findAllByUserId(
     if (filters.startDate) (where.date as Prisma.DateTimeFilter).gte = new Date(filters.startDate);
     if (filters.endDate) (where.date as Prisma.DateTimeFilter).lte = new Date(filters.endDate);
   }
-  if (filters.type) where.type = filters.type as TransactionType;
-  if (filters.categoryId) where.categoryId = filters.categoryId;
+  if (filters.type != null) where.type = filters.type;
+  if (filters.category != null) where.category = filters.category;
 
   const [items, total] = await Promise.all([
     prisma.transaction.findMany({
       where,
-      include: { category: true },
       orderBy: { date: 'desc' },
       skip: (filters.page! - 1) * filters.limit!,
       take: filters.limit!,
@@ -33,7 +32,6 @@ export async function findAllByUserId(
 export async function findById(id: string) {
   return prisma.transaction.findUnique({
     where: { id },
-    include: { category: true },
   });
 }
 
@@ -48,14 +46,13 @@ export async function create(
       userId,
       description: data.description,
       amount: new Prisma.Decimal(data.amount),
-      type: data.type as TransactionType,
+      type: data.type,
+      category: data.category,
       date: new Date(data.date),
       notes: data.notes,
-      categoryId: data.categoryId,
       installmentId,
       subscriptionId,
     },
-    include: { category: true },
   });
 }
 
@@ -65,12 +62,11 @@ export async function update(id: string, data: UpdateTransactionInput) {
     data: {
       ...(data.description != null && { description: data.description }),
       ...(data.amount != null && { amount: new Prisma.Decimal(data.amount) }),
-      ...(data.type != null && { type: data.type as TransactionType }),
+      ...(data.type != null && { type: data.type }),
       ...(data.date != null && { date: new Date(data.date) }),
       ...(data.notes !== undefined && { notes: data.notes }),
-      ...(data.categoryId != null && { categoryId: data.categoryId }),
+      ...(data.category != null && { category: data.category }),
     },
-    include: { category: true },
   });
 }
 
@@ -94,7 +90,7 @@ export async function getSummaryByDateRange(
     _sum: { amount: true },
   });
 
-  const totalIncome = Number(result.find((r) => r.type === 'INCOME')?._sum.amount ?? 0);
-  const totalExpense = Number(result.find((r) => r.type === 'EXPENSE')?._sum.amount ?? 0);
+  const totalIncome = Number(result.find((r) => r.type === TransactionType.INCOME)?._sum.amount ?? 0);
+  const totalExpense = Number(result.find((r) => r.type === TransactionType.EXPENSE)?._sum.amount ?? 0);
   return { totalIncome, totalExpense };
 }

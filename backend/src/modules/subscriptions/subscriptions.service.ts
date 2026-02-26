@@ -1,6 +1,6 @@
 import type { CreateSubscriptionInput, UpdateSubscriptionInput } from './subscriptions.schema.js';
 import * as subscriptionsRepository from './subscriptions.repository.js';
-import * as categoriesRepository from '@/modules/categories/categories.repository.js';
+import { validateCategory } from '@/shared/utils/category-validator.js';
 
 export async function getSubscriptions(userId: string, isActive?: boolean) {
   return subscriptionsRepository.findAllByUserId(userId, isActive);
@@ -17,10 +17,9 @@ export async function getSubscriptionById(id: string, userId: string) {
 }
 
 export async function createSubscription(userId: string, data: CreateSubscriptionInput) {
-  const category = await categoriesRepository.findById(data.categoryId);
-  if (!category || category.userId !== userId) {
-    const error = new Error('Category not found');
-    (error as Error & { statusCode?: number }).statusCode = 404;
+  if (!validateCategory(data.type, data.category)) {
+    const error = new Error('Invalid category for subscription type');
+    (error as Error & { statusCode?: number }).statusCode = 400;
     throw error;
   }
   return subscriptionsRepository.create(userId, data);
@@ -28,13 +27,10 @@ export async function createSubscription(userId: string, data: CreateSubscriptio
 
 export async function updateSubscription(id: string, userId: string, data: UpdateSubscriptionInput) {
   await getSubscriptionById(id, userId);
-  if (data.categoryId) {
-    const category = await categoriesRepository.findById(data.categoryId);
-    if (!category || category.userId !== userId) {
-      const error = new Error('Category not found');
-      (error as Error & { statusCode?: number }).statusCode = 404;
-      throw error;
-    }
+  if (data.type != null && data.category != null && !validateCategory(data.type, data.category)) {
+    const error = new Error('Invalid category for subscription type');
+    (error as Error & { statusCode?: number }).statusCode = 400;
+    throw error;
   }
   return subscriptionsRepository.update(id, data);
 }

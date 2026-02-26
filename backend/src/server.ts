@@ -1,7 +1,8 @@
-import { buildApp } from "./app";
-import { env } from './shared/config/env';
+import 'dotenv/config';
+import { env } from './shared/config/env.js';
+import { buildApp } from './app.js';
 
-async function start(){
+async function start() {
     const app = await buildApp();
 
     const port = env.PORT || 3000;

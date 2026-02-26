@@ -1,12 +1,13 @@
 import Fastify from 'fastify';
-import { registerCors } from './shared/middleware/cors.middleware';
-import { errorHandler } from './shared/middleware/error.middleware';
-import { authRoutes } from './modules/auth/auth.controller';
-import { transactionsRoutes } from './modules/transactions/transactions.controller';
+import { env } from './shared/config/env.js';
+import { registerCors } from './shared/middleware/cors.middleware.js';
+import { errorHandler } from './shared/middleware/error.middleware.js';
+import { authRoutes } from './modules/auth/auth.controller.js';
+import { transactionsRoutes } from './modules/transactions/transactions.controller.js';
 
-export async function buildApp(){
+export async function buildApp() {
     const app = Fastify({
-        logger: process.env.NODE_ENV === 'production'
+        logger: env.NODE_ENV === 'production',
     });
 
     await registerCors(app);

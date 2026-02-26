@@ -4,7 +4,6 @@ import type { CreateSubscriptionInput, UpdateSubscriptionInput } from './subscri
 export async function findAllByUserId(userId: string, isActive?: boolean) {
   return prisma.subscription.findMany({
     where: { userId, ...(isActive !== undefined && { isActive }) },
-    include: { category: true },
     orderBy: { createdAt: 'desc' },
   });
 }
@@ -12,7 +11,7 @@ export async function findAllByUserId(userId: string, isActive?: boolean) {
 export async function findById(id: string) {
   return prisma.subscription.findUnique({
     where: { id },
-    include: { category: true, transactions: true },
+    include: { transactions: true },
   });
 }
 
@@ -23,9 +22,9 @@ export async function create(userId: string, data: CreateSubscriptionInput) {
       description: data.description,
       amount: data.amount,
       billingDay: data.billingDay,
-      categoryId: data.categoryId,
+      type: data.type,
+      category: data.category,
     },
-    include: { category: true },
   });
 }
 
@@ -36,10 +35,10 @@ export async function update(id: string, data: UpdateSubscriptionInput) {
       ...(data.description != null && { description: data.description }),
       ...(data.amount != null && { amount: data.amount }),
       ...(data.billingDay != null && { billingDay: data.billingDay }),
-      ...(data.categoryId != null && { categoryId: data.categoryId }),
+      ...(data.type != null && { type: data.type }),
+      ...(data.category != null && { category: data.category }),
       ...(data.isActive !== undefined && { isActive: data.isActive }),
     },
-    include: { category: true },
   });
 }
 

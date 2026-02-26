@@ -1,26 +1,26 @@
 export interface CreateTransactionInput {
   description: string;
   amount: number;
-  type: 'INCOME' | 'EXPENSE';
+  type: 1 | 2;
   date: string;
   notes?: string;
-  categoryId: string;
+  category: number;
 }
 
 export interface UpdateTransactionInput {
   description?: string;
   amount?: number;
-  type?: 'INCOME' | 'EXPENSE';
+  type?: 1 | 2;
   date?: string;
   notes?: string;
-  categoryId?: string;
+  category?: number;
 }
 
 export interface TransactionFilters {
   startDate?: string;
   endDate?: string;
-  type?: 'INCOME' | 'EXPENSE';
-  categoryId?: string;
+  type?: 1 | 2;
+  category?: number;
   page?: number;
   limit?: number;
 }

@@ -1,8 +1,8 @@
-import { TransactionType } from '@prisma/client';
 import { prisma } from '@/shared/config/database.js';
 import type { CreateInstallmentInput } from './installments.schema.js';
 import * as installmentsRepository from './installments.repository.js';
-import * as categoriesRepository from '@/modules/categories/categories.repository.js';
+import { TransactionType } from '@/shared/types/categories.enum.js';
+import { validateCategory } from '@/shared/utils/category-validator.js';
 
 function addMonths(date: Date, months: number): Date {
   const result = new Date(date);
@@ -25,16 +25,14 @@ export async function getInstallmentById(id: string, userId: string) {
 }
 
 export async function createInstallment(userId: string, data: CreateInstallmentInput) {
-  const category = await categoriesRepository.findById(data.categoryId);
-  if (!category || category.userId !== userId) {
-    const error = new Error('Category not found');
-    (error as Error & { statusCode?: number }).statusCode = 404;
+  if (!validateCategory(TransactionType.EXPENSE, data.category)) {
+    const error = new Error('Invalid expense category');
+    (error as Error & { statusCode?: number }).statusCode = 400;
     throw error;
   }
 
   const installment = await installmentsRepository.create(userId, data);
   const amountPerInstallment = Number(installment.totalAmount) / data.totalInstallments;
-  const type = category.type;
 
   const transactionsToCreate = [];
   for (let i = 0; i < data.totalInstallments; i++) {
@@ -43,9 +41,9 @@ export async function createInstallment(userId: string, data: CreateInstallmentI
       userId,
       description: `${data.description} (${i + 1}/${data.totalInstallments})`,
       amount: amountPerInstallment,
-      type,
+      type: TransactionType.EXPENSE,
+      category: data.category,
       date: installmentDate,
-      categoryId: data.categoryId,
       installmentId: installment.id,
     });
   }
@@ -55,9 +53,9 @@ export async function createInstallment(userId: string, data: CreateInstallmentI
       userId: t.userId,
       description: t.description,
       amount: t.amount,
-      type: t.type as TransactionType,
+      type: t.type,
+      category: t.category,
       date: t.date,
-      categoryId: t.categoryId,
       installmentId: t.installmentId,
     })),
   });

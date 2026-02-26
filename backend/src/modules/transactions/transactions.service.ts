@@ -1,7 +1,7 @@
 import type { CreateTransactionInput, UpdateTransactionInput, SummaryResult } from './transactions.types.js';
 import type { ListTransactionsQuery, SummaryQuery } from './transactions.schema.js';
 import * as transactionsRepository from './transactions.repository.js';
-import * as categoriesRepository from '@/modules/categories/categories.repository.js';
+import { validateCategory } from '@/shared/utils/category-validator.js';
 
 export async function listTransactions(userId: string, query: ListTransactionsQuery) {
   const { page = 1, limit = 20, ...rest } = query;
@@ -24,10 +24,9 @@ export async function createTransaction(
   installmentId?: string,
   subscriptionId?: string,
 ) {
-  const category = await categoriesRepository.findById(data.categoryId);
-  if (!category || category.userId !== userId) {
-    const error = new Error('Category not found');
-    (error as Error & { statusCode?: number }).statusCode = 404;
+  if (!validateCategory(data.type, data.category)) {
+    const error = new Error('Invalid category for transaction type');
+    (error as Error & { statusCode?: number }).statusCode = 400;
     throw error;
   }
   return transactionsRepository.create(userId, data, installmentId, subscriptionId);
@@ -35,13 +34,10 @@ export async function createTransaction(
 
 export async function updateTransaction(id: string, userId: string, data: UpdateTransactionInput) {
   await getTransactionById(id, userId);
-  if (data.categoryId) {
-    const category = await categoriesRepository.findById(data.categoryId);
-    if (!category || category.userId !== userId) {
-      const error = new Error('Category not found');
-      (error as Error & { statusCode?: number }).statusCode = 404;
-      throw error;
-    }
+  if (data.type != null && data.category != null && !validateCategory(data.type, data.category)) {
+    const error = new Error('Invalid category for transaction type');
+    (error as Error & { statusCode?: number }).statusCode = 400;
+    throw error;
   }
   return transactionsRepository.update(id, data);
 }

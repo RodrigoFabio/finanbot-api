@@ -4,7 +4,7 @@ import type { CreateInstallmentInput } from './installments.schema.js';
 export async function findAllByUserId(userId: string) {
   return prisma.installment.findMany({
     where: { userId },
-    include: { category: true, transactions: true },
+    include: { transactions: true },
     orderBy: { startDate: 'desc' },
   });
 }
@@ -12,7 +12,7 @@ export async function findAllByUserId(userId: string) {
 export async function findById(id: string) {
   return prisma.installment.findUnique({
     where: { id },
-    include: { category: true, transactions: true },
+    include: { transactions: true },
   });
 }
 
@@ -24,9 +24,8 @@ export async function create(userId: string, data: CreateInstallmentInput) {
       totalAmount: data.totalAmount,
       totalInstallments: data.totalInstallments,
       startDate: new Date(data.startDate),
-      categoryId: data.categoryId,
+      category: data.category,
     },
-    include: { category: true },
   });
 }
 
@@ -58,6 +57,6 @@ export async function deleteFutureTransactions(installmentId: string, afterDate:
 export async function getInstallmentWithTransactions(id: string) {
   return prisma.installment.findUnique({
     where: { id },
-    include: { transactions: { orderBy: { date: 'asc' } }, category: true },
+    include: { transactions: { orderBy: { date: 'asc' } } },
   });
 }

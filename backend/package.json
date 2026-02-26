@@ -1,6 +1,7 @@
 {
   "name": "finanbot-api",
   "version": "1.0.0",
+  "type": "module",
   "description": "Backend API for personal finance application",
   "main": "dist/server.js",
   "scripts": {

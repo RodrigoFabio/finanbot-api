@@ -1,7 +1,8 @@
 import { FastifyError, FastifyReply, FastifyRequest } from 'fastify';
 import { ZodError } from 'zod';
 import { Prisma } from '@prisma/client';
-import { logger } from '../config/logger';
+import { logger } from '../config/logger.js';
+import { env } from '../config/env.js';
 
 export async function errorHandler(
   error: FastifyError,
@@ -52,6 +53,6 @@ export async function errorHandler(
   await reply.status(statusCode).send({
     success: false,
     error: statusCode >= 500 ? 'Internal server error' : error.message ?? 'Error',
-    ...(process.env.NODE_ENV === 'development' && { details: error.stack }),
+    ...(env.NODE_ENV === 'development' && { details: error.stack }),
   });
 }
