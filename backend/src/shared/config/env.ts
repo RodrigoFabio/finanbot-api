@@ -21,3 +21,7 @@ function loadEnv(): Env {
 }
 
 export const env = loadEnv();
+
+export function validateEnv(): Env {
+  return env;
+}

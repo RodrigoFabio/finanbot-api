@@ -1,7 +1,7 @@
 import { FastifyError, FastifyReply, FastifyRequest } from 'fastify';
 import { ZodError } from 'zod';
 import { Prisma } from '@prisma/client';
-import { logger } from '../config/logger.js';
+import { logger } from '../config/logger';
 
 export async function errorHandler(
   error: FastifyError,
