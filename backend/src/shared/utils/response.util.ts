@@ -1,6 +1,6 @@
 import { FastifyReply } from 'fastify';
 
-export function success<T>(reply: FastifyReply, statusCode: number, data: T): Promise<FastifyReply> {
+export function success<T>(reply: FastifyReply, statusCode: number, data: T): FastifyReply {
   return reply.status(statusCode).send({
     success: true,
     data,
@@ -12,7 +12,7 @@ export function error(
   statusCode: number,
   message: string,
   details?: unknown,
-): Promise<FastifyReply> {
+): FastifyReply {
   return reply.status(statusCode).send({
     success: false,
     error: message,
