@@ -1,7 +1,9 @@
 import { FastifyError, FastifyReply, FastifyRequest } from 'fastify';
 import { ZodError } from 'zod';
-import { Prisma } from '@prisma/client';
-import { logger } from '../config/logger.js';
+import {
+  PrismaClientKnownRequestError,
+  PrismaClientValidationError,
+} from '@prisma/client/runtime/library.js';import { logger } from '../config/logger.js';
 import { env } from '../config/env.js';
 
 export async function errorHandler(
@@ -19,7 +21,7 @@ export async function errorHandler(
     return;
   }
 
-  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+  if (error instanceof PrismaClientKnownRequestError) {
     if (error.code === 'P2002') {
       await reply.status(409).send({
         success: false,
@@ -38,7 +40,7 @@ export async function errorHandler(
     }
   }
 
-  if (error instanceof Prisma.PrismaClientValidationError) {
+  if (error instanceof PrismaClientValidationError) {
     await reply.status(400).send({
       success: false,
       error: 'Validation error',
