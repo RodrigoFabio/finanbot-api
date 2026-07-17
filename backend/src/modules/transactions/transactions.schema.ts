@@ -41,7 +41,7 @@ export const updateTransactionSchema = z
 export const listTransactionsQuerySchema = z.object({
   startDate: dateSchema.optional(),
   endDate: dateSchema.optional(),
-  type: transactionTypeSchema.optional(),
+  type: z.coerce.number().pipe(transactionTypeSchema).optional(),
   category: z.coerce.number().int().optional(),
   page: z.coerce.number().int().min(1).optional().default(1),
   limit: z.coerce.number().int().min(1).max(100).optional().default(20),

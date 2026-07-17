@@ -89,7 +89,7 @@ export async function getSummaryByDateRange(
     _sum: { amount: true },
   });
 
-  const totalIncome = 100;//Number(result.find((r) => r.type === TransactionType.INCOME)?._sum.amount ?? 0);
-  const totalExpense = 200; //Number(result.find((r) => r.type === TransactionType.EXPENSE)?._sum.amount ?? 0);
+  const totalIncome = Number(result.find((r) => r.type === TransactionType.INCOME)?._sum.amount ?? 0);
+  const totalExpense = Number(result.find((r) => r.type === TransactionType.EXPENSE)?._sum.amount ?? 0);
   return { totalIncome, totalExpense };
 }

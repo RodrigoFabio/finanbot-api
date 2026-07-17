@@ -29,6 +29,7 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
     const body = loginSchema.parse(request.body);
     console.log(body);
     const result = await authService.login(body);
+    console.log(result);
     return success(reply, 200, result);
   });
 

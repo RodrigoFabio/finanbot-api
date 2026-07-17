@@ -28,7 +28,7 @@ export async function transactionsRoutes(app: FastifyInstance): Promise<void> {
     });
   });
 
-  app.get<{ Params: ParamsId }>('/summary', async (request, reply) => {
+  app.get<{ Querystring: unknown }>('/summary', async (request, reply) => {
     const userId = request.user!.id;
     const query = summaryQuerySchema.parse(request.query);
     const summary = await transactionsService.getSummary(userId, query);

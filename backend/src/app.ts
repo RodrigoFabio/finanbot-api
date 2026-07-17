@@ -6,6 +6,8 @@ import { authRoutes } from './modules/auth/auth.controller.js';
 import { transactionsRoutes } from './modules/transactions/transactions.controller.js';
 import fastifyCookie from '@fastify/cookie';
 import { AutomateController } from './modules/automate/automate.controller.js';
+import { installmentsRoutes } from './modules/installments/installments.controller.js';
+import { subscriptionsRoutes } from './modules/subscriptions/subscriptions.controller.js';
 
 export async function buildApp() {
     const app = Fastify({
@@ -18,6 +20,8 @@ export async function buildApp() {
     app.register(transactionsRoutes, { prefix: '/api/transactions' });
     app.register(fastifyCookie);
     app.register(AutomateController, {prefix: '/api/automate'});
+    app.register(installmentsRoutes, { prefix: '/api/installments' });
+    app.register(subscriptionsRoutes, { prefix: '/api/subscriptions' });
     app.setErrorHandler(errorHandler);
 
     return app;

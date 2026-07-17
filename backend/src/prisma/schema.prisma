@@ -25,6 +25,8 @@ model User {
   installments   Installment[]
   subscriptions  Subscription[]
   refreshTokens  RefreshToken[]
+
+  @@map("users")
 }
 
 model Transaction {
