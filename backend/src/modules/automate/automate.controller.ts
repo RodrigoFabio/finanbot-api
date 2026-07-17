@@ -2,7 +2,7 @@ import { success } from '@/shared/utils/response.util.js';
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
  interface ExpensiveAutomate {
-    value :Number;
+    value :string;
     nameStore: string;
 }
 
